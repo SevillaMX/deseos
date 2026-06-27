@@ -3,11 +3,27 @@ import { useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 
+const inputStyle = {
+  width: '100%',
+  padding: '12px 16px',
+  background: '#0B0B0C',
+  border: '1px solid #2A2A2A',
+  borderRadius: 10,
+  color: '#fff',
+  fontSize: 15,
+  outline: 'none',
+  boxSizing: 'border-box' as const,
+  transition: 'border-color 0.15s',
+}
+
 export default function SignInPage() {
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError]       = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [mode, setMode]           = useState<'signin' | 'signup'>('signin')
+  const [email, setEmail]         = useState('')
+  const [password, setPassword]   = useState('')
+  const [name, setName]           = useState('')
+  const [error, setError]         = useState('')
+  const [success, setSuccess]     = useState('')
+  const [loading, setLoading]     = useState(false)
   const router = useRouter()
 
   const sb = createBrowserClient(
@@ -15,18 +31,49 @@ export default function SignInPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error } = await sb.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError(error.message)
-      setLoading(false)
+    setSuccess('')
+
+    if (mode === 'signin') {
+      const { error } = await sb.auth.signInWithPassword({ email, password })
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      } else {
+        router.push('/home')
+        router.refresh()
+      }
     } else {
-      router.push('/home')
-      router.refresh()
+      const { error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } },
+      })
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      } else {
+        setSuccess('¡Cuenta creada! Revisa tu email para confirmar, o entra directo si la confirmación está desactivada.')
+        setLoading(false)
+        // Try to auto-sign-in
+        setTimeout(async () => {
+          const { error: signInErr } = await sb.auth.signInWithPassword({ email, password })
+          if (!signInErr) {
+            router.push('/home')
+            router.refresh()
+          }
+        }, 1500)
+      }
     }
+  }
+
+  const toggle = () => {
+    setMode(m => m === 'signin' ? 'signup' : 'signin')
+    setError('')
+    setSuccess('')
   }
 
   return (
@@ -49,20 +96,34 @@ export default function SignInPage() {
       }}>
         {/* Logo */}
         <div style={{ marginBottom: 32 }}>
-          <div style={{
-            fontSize: 32,
-            fontWeight: 800,
-            letterSpacing: '-1px',
-            color: '#fff',
-          }}>
+          <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-1px', color: '#fff' }}>
             dese<span style={{ color: '#ACEC00' }}>OS</span><span style={{ color: '#666' }}>.io</span>
           </div>
           <p style={{ color: '#666', margin: '8px 0 0', fontSize: 15 }}>
-            Tu sistema operativo de negocio
+            {mode === 'signin' ? 'Tu sistema operativo de negocio' : 'Crea tu cuenta gratis'}
           </p>
         </div>
 
-        <form onSubmit={handleSignIn}>
+        <form onSubmit={handleSubmit}>
+          {/* Name — solo en signup */}
+          {mode === 'signup' && (
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', color: '#888', marginBottom: 6, fontSize: 13, fontWeight: 500 }}>
+                NOMBRE
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+                placeholder="Tu nombre"
+                style={inputStyle}
+                onFocus={e => e.target.style.borderColor = '#7A5CFF'}
+                onBlur={e => e.target.style.borderColor = '#2A2A2A'}
+              />
+            </div>
+          )}
+
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', color: '#888', marginBottom: 6, fontSize: 13, fontWeight: 500 }}>
               EMAIL
@@ -73,18 +134,7 @@ export default function SignInPage() {
               onChange={e => setEmail(e.target.value)}
               required
               placeholder="tu@email.com"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: '#0B0B0C',
-                border: '1px solid #2A2A2A',
-                borderRadius: 10,
-                color: '#fff',
-                fontSize: 15,
-                outline: 'none',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.15s',
-              }}
+              style={inputStyle}
               onFocus={e => e.target.style.borderColor = '#7A5CFF'}
               onBlur={e => e.target.style.borderColor = '#2A2A2A'}
             />
@@ -100,18 +150,8 @@ export default function SignInPage() {
               onChange={e => setPassword(e.target.value)}
               required
               placeholder="••••••••"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: '#0B0B0C',
-                border: '1px solid #2A2A2A',
-                borderRadius: 10,
-                color: '#fff',
-                fontSize: 15,
-                outline: 'none',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.15s',
-              }}
+              minLength={6}
+              style={inputStyle}
               onFocus={e => e.target.style.borderColor = '#7A5CFF'}
               onBlur={e => e.target.style.borderColor = '#2A2A2A'}
             />
@@ -131,6 +171,20 @@ export default function SignInPage() {
             </div>
           )}
 
+          {success && (
+            <div style={{
+              color: '#ACEC00',
+              background: 'rgba(172,236,0,0.08)',
+              border: '1px solid rgba(172,236,0,0.2)',
+              borderRadius: 8,
+              padding: '10px 14px',
+              marginBottom: 16,
+              fontSize: 14,
+            }}>
+              {success}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
@@ -147,9 +201,30 @@ export default function SignInPage() {
               transition: 'background 0.15s',
             }}
           >
-            {loading ? 'Entrando...' : 'Entrar al OS →'}
+            {loading
+              ? (mode === 'signin' ? 'Entrando...' : 'Creando cuenta...')
+              : (mode === 'signin' ? 'Entrar al OS →' : 'Crear cuenta →')}
           </button>
         </form>
+
+        {/* Toggle */}
+        <p style={{ textAlign: 'center', marginTop: 24, color: '#555', fontSize: 14 }}>
+          {mode === 'signin' ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
+          <button
+            onClick={toggle}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#ACEC00',
+              cursor: 'pointer',
+              fontSize: 14,
+              fontWeight: 600,
+              padding: 0,
+            }}
+          >
+            {mode === 'signin' ? 'Crear cuenta' : 'Iniciar sesión'}
+          </button>
+        </p>
       </div>
     </div>
   )
