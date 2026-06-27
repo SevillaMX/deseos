@@ -1,0 +1,254 @@
+/**
+ * DeseOS overrides
+ * Se carga DESPUÉS de style.min.css
+ * Regla: tocar lo mínimo posible — el DL hace el trabajo pesado
+ */
+
+/* ── Undo Tailwind preflight en imágenes ── */
+img {
+  max-width: unset;
+  height: unset;
+}
+
+/* ── Shell: sidebar + main flex ── */
+.main {
+  display: flex !important;
+  min-height: calc(100vh - 64px);
+}
+.main__content {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+/* ── Logo: ocultar ícono rotante ── */
+.logo__rotate {
+  display: none;
+}
+
+/* ── Imágenes del sidebar (avatars) ── */
+.post-body-top__link-img {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+.aside-block-item__img-image {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DeseOS Sub-Page Base Styles
+   Clases que las 6 páginas usan y el DL CSS no define
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Page header ── */
+.main__head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 2rem 0;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.main__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+.main__subtitle {
+  font-size: 0.875rem;
+  color: #888;
+  margin: 0;
+  flex-basis: 100%;
+  margin-top: -0.75rem;
+}
+
+/* ── Content padding ── */
+.main__content > .main__grid,
+.main__content > .kpi-grid,
+.main__content > .eights-grid,
+.main__content > .brand-score-hero,
+.main__content > .platform-filters,
+.main__content > .content-grid,
+.main__content > .kanban,
+.main__content > .courses-grid,
+.main__content > .feed,
+.main__content > .activity-feed,
+.main__content > .section,
+.main__content > .locked-screen {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* ── 2-column grid ── */
+.main__grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+}
+.grid__col { min-width: 0; }
+.grid__col--left { order: -1; max-width: 220px; }
+@media (max-width: 900px) {
+  .main__grid { grid-template-columns: 1fr; }
+  .grid__col--left { order: 0; max-width: 100%; }
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, transform 0.1s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn:hover  { opacity: 0.85; }
+.btn:active { transform: scale(0.97); }
+.btn--primary  { background: #7A5CFF; color: #fff; }
+.btn--sm       { padding: 6px 14px; font-size: 0.8rem; }
+.btn--outline  { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+
+/* ── Widget ── */
+.widget {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.widget__title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #666;
+  margin: 0 0 0.875rem;
+}
+.widget__list { list-style: none; margin: 0; padding: 0; }
+.widget__list-item { margin-bottom: 2px; }
+.widget__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  color: #ccc;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: background 0.15s;
+}
+.widget__link:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.widget__icon { color: #888; font-size: 0.9em; }
+.widget__empty { color: #555; font-size: 0.82rem; padding: 0.25rem 0; margin: 0; }
+
+/* ── Section ── */
+.section { margin-bottom: 2rem; }
+.section__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1rem;
+}
+.section__empty { color: #555; font-size: 0.85rem; margin: 0; }
+
+/* ── Community: create post ── */
+.create-post {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+.create-post__avatar { flex-shrink: 0; }
+.create-post__avatar img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.create-post__input { flex: 1; }
+.create-post__input input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #aaa;
+  font-size: 0.875rem;
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* ── Community: feed ── */
+.feed { display: flex; flex-direction: column; gap: 1rem; }
+.feed__item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+.feed__empty {
+  text-align: center;
+  padding: 3rem;
+  color: #888;
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,255,255,0.08);
+  border-radius: 14px;
+}
+.feed__empty h3 { color: #fff; margin: 0 0 0.5rem; }
+.feed__empty p  { margin: 0; font-size: 0.875rem; }
+
+.post__header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.post__avatar img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.post__info { display: flex; flex-direction: column; gap: 2px; }
+.post__name { font-size: 0.875rem; font-weight: 600; color: #fff; }
+.post__date { font-size: 0.75rem; color: #666; }
+.post__title { font-size: 1rem; font-weight: 700; margin: 0 0 0.5rem; color: #fff; }
+.post__content p { font-size: 0.875rem; color: #ccc; margin: 0; line-height: 1.6; }
+.post__footer { display: flex; gap: 0.75rem; margin-top: 1rem; }
+.post__action {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.post__action:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
+/* ── Community: members mini ── */
+.members-mini { display: flex; gap: 4px; flex-wrap: wrap; }
+.members-mini__avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  object-fit: cover; border: 2px solid #1a1a1a;
+}
+
+/* ── Locked screen ── */
+.locked-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1rem;
+}
+.locked-screen__icon { font-size: 4rem; }
+.locked-screen h2 { font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0; }
+.locked-screen p  { color: #888; margin: 0; font-size: 0.9rem; }
